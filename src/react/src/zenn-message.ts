@@ -1,8 +1,5 @@
 import unified from "unified";
 import { Node, Parent } from "unist";
-import parser from "remark-parse";
-import toHast from "remark-rehype";
-import compiler from "rehype-stringify";
 import visit from "unist-util-visit";
 import { VFileCompatible } from "vfile";
 import { H } from "mdast-util-to-hast";
@@ -10,7 +7,6 @@ import { Paragraph } from "mdast";
 
 import { isParent, isText, isParagraph } from "./util";
 import all from "./all";
-import print from "./print";
 
 const MESSAGE_BEGGINING = ":::message\n";
 const MESSAGE_ENDING = "\n:::";
@@ -97,56 +93,3 @@ export function handler(h: H, node: Node) {
     children: all(h, node),
   };
 }
-
-// processor
-const processor = unified()
-  .use(parser)
-  .use(attacher)
-  .use(toHast, {
-    handlers: {
-      message: handler,
-    },
-  })
-  .use(compiler);
-
-// test
-const TEST_DATA = {
-  SIMPLE: `
-:::message
-This is a message
-:::
-`,
-  NESTED: `
-:::message
-This is a **message**
-:::
-`,
-  MISSED_BEGINNING: `
-:::messgae
-This is a message
-:::
-`,
-  MISSED_ENDING: `
-:::message
-This is a message
-::
-`,
-};
-
-const result = Object.entries(TEST_DATA).reduce<{ [key: string]: string }>(
-  (result, [name, data]) => {
-    result[name] = processor.processSync(data).toString();
-    return result;
-  },
-  {}
-);
-
-console.log(result);
-/*
- * {
- *   SIMPLE: '<div class="msg">This is a message</div>',
- *   NESTED: '<div class="msg">This is a <strong>message</strong></div>',
- *   MISSED_BEGINNING: '<p>:::messgae\nThis is a message\n:::</p>',
- *   MISSED_ENDING: '<p>:::message\nThis is a message\n::</p>'
- * }
- * */

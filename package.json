@@ -19,6 +19,7 @@
     "mdast-util-to-hast": "^10.2.0",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
+    "react-remark": "^2.0.3",
     "rehype-react": "^6.2.0",
     "rehype-stringify": "^8.0.0",
     "remark-parse": "^9.0.0",
